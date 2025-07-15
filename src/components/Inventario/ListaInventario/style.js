@@ -1,6 +1,6 @@
 import styled from "styled-components/native";
 
-export const Item = styled.View`
+export const Item = styled.TouchableOpacity`
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -17,6 +17,12 @@ export const NomeItem = styled.Text`
 export const Ean = styled.Text`
     margin-top: 10px;
     color: #000;
+`;
+
+export const ContainerQuantidade = styled.View`
+    flex-direction: row;
+    justify-content: space-between;
+    padding-right: 20px;
 `;
 
 export const Quantidade = styled.Text`

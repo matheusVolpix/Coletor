@@ -14,23 +14,32 @@ import { BoxForm,
     NomeItem,
     Ean,
     Quantidade,
-    Botao
+    Botao,
+    BoxButtons,
+    BotaoFiltrar,
+    TextoBotaoFiltrar,
  } from "./style";
+
+import { BotaoLeitor } from "../../Recebimento/style";
 import { AuthContext } from "../../../contextApi/auth";
 import Header from "../../../components/Header";
 import { Container } from "../style";
-import { ActivityIndicator, FlatList, Modal, ScrollView } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Modal, ScrollView } from "react-native";
 import ListaInventario from "../../../components/Inventario/ListaInventario";
 import ModalInventario from "../../../components/Inventario/ModalInventario";
 import ModalCamera from "../../../components/modals/ModalCamera";
 import Barcode from "../../../components/Barcode";
+import Icon from "react-native-vector-icons/Feather";
 
 
 export default ({route}) => {
 
-    const {codigo} = route.params;  
+    const {codigo, nome} = route.params;
+    
+    // const codigo = '0125040001';
+    // const nome = "Inventario Rotativo";
 
-    const {user, ip} = useContext(AuthContext);
+    const {user, ip, ipLink} = useContext(AuthContext);
     const [modal, setModal] = useState(false);
     const [items, setItems] = useState([]);
     const [descricao, setDescricao] = useState('');
@@ -39,53 +48,89 @@ export default ({route}) => {
     const [itemSelected, setItemSelected] = useState();
     const [loadAmount, setLoadAmount] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
+    const [filterItens, setFilterItens] = useState("todos");
 
     useEffect(() => {
 
-        async function getProducts(){
+        
 
-            setLoadItens(true);
-            try{
-
-                const response = await fetch('http://volpix.com.br/api/inventario/lista-itens-inventario/'+ codigo, {
-                    method: 'GET',
-                    headers: {
-                        'Accept' : "/",
-                        'user': user.user,
-                        'password': user.pass,
-                        'ip': ip
-                    }
-                }).then((response) => response.json())
-                .then((json) => {
-                    
-                    setItems(json.inventarios);
-
-                    setLoadItens(false);
-                })
-
-            }catch(error){
-                console.log(error);
-
-                setLoadItens(false);
-            }
-
-            setLoadItens(false);
-
-        }
-
-        getProducts();
+        buscarTudo();
 
         
 
     }, []);
 
-    async function buscar()
+    async function getProducts(){
+
+        setLoadItens(true);
+        try{
+
+            const response = await fetch(ipLink+'/inventario/meus-itens/'+ codigo, {
+                method: 'GET',
+                headers: {
+                    'Accept' : "/",
+                    'user': user.user,
+                    'password': user.pass,
+                    'ip': ip
+                }
+            }).then((response) => response.json())
+            .then((json) => {
+                
+                setItems(json.inventarios);
+
+                setLoadItens(false);
+            })
+
+        }catch(error){
+            console.log(error);
+
+            setLoadItens(false);
+        }
+
+        setLoadItens(false);
+
+        
+    }
+
+    async function buscarItensNaoContados(){
+
+        setLoadItens(true);
+        try{
+
+            const response = await fetch(ipLink+'/inventario/meus-itens-nao-contados/'+ codigo, {
+                method: 'GET',
+                headers: {
+                    'Accept' : "/",
+                    'user': user.user,
+                    'password': user.pass,
+                    'ip': ip
+                }
+            }).then((response) => response.json())
+            .then((json) => {
+                
+                setItems(json.inventarios);
+
+                setLoadItens(false);
+            })
+
+        }catch(error){
+            console.log(error);
+
+            setLoadItens(false);
+        }
+
+        setLoadItens(false);
+
+        
+    }
+
+    async function buscar(codigoEan)
     {
 
         setLoadItens(true);
         try{
 
-            const response = await fetch('http://volpix.com.br/api/inventario/buscar-item', {
+            const response = await fetch(ipLink+'/inventario/buscar-item', {
                 method: 'POST',
                 headers: {
                     'Accept' : "application/json",
@@ -95,14 +140,59 @@ export default ({route}) => {
                     'ip': ip
                 },
                 body: new URLSearchParams({
-                    ean: ean,
-                    descricao: descricao,
+                    ean: codigoEan,
                     codigo: codigo
                 }).toString(),
             }).then((response) => response.json())
             .then((json) => {
+
+
+                if(json.inventarios != null){
+                    setItems(json.inventarios);
+                }else{
+                    if(json.ean != null){
+                        let iten = {
+                            descricao: "Produto não encontrado no inventario",
+                            CODIGOEAN: codigoEan,
+                            QUANTIDADE: 0
+                        }
+                        openModal(iten);
+                    }
+                    
+                }
                 
+                
+                setLoadItens(false);
+            })
+
+        }catch(error){
+            console.log(error);
+
+            setLoadItens(false);
+        }
+
+        setLoadItens(false);
+    }
+
+    async function buscarTudo()
+    {
+
+        setLoadItens(true);
+        try{
+
+            const response = await fetch(ipLink+'/inventario/todos-itens/'+codigo, {
+                method: 'GET',
+                headers: {
+                    'Accept' : "application/json",
+                    'user': user.user,
+                    'password': user.pass,
+                    'ip': ip
+                },
+            }).then((response) => response.json())
+            .then((json) => {
+
                 setItems(json.inventarios);
+                
                 setLoadItens(false);
             })
 
@@ -142,7 +232,7 @@ export default ({route}) => {
         setLoadAmount(true);
         try{
 
-            const response = await fetch('http://volpix.com.br/api/inventario/quantidade', {
+            const response = await fetch(ipLink+'/inventario/quantidade', {
                 method: 'POST',
                 headers: {
                     'Accept' : "application/json",
@@ -161,7 +251,20 @@ export default ({route}) => {
             }).then((response) => response.json())
             .then((json) => {
                 
-                setItems(json.inventarios);
+                if(filterItens == 'todos'){
+                    buscarTudo();
+           
+                }
+
+                if(filterItens == 'contados'){
+                    getProducts();
+                    
+                }
+
+                if(filterItens == 'nao contados'){
+                    buscarItensNaoContados();
+                    
+                }
                 setModal(false);
                 setLoadAmount(false);
 
@@ -215,6 +318,26 @@ export default ({route}) => {
         setLoadAmount(false);
     }
 
+    async function changeItens(change)
+    {
+        setFilterItens(change);
+
+        if(change == 'todos'){
+            buscarTudo();
+            return;
+        }
+
+        if(change == 'contados'){
+            getProducts();
+            return;
+        }
+
+        if(change == 'nao contados'){
+            buscarItensNaoContados();
+            return;
+        }
+    } 
+
     value = newValue => {
 
         let remove = newValue.replace(/\["/, "");
@@ -233,9 +356,9 @@ export default ({route}) => {
             
         }
 
-
         setEan(newEan + remove2);
         setShowCamera(false);
+        buscar(newEan + remove2);
     }
 
     return(
@@ -244,28 +367,19 @@ export default ({route}) => {
             <Container>
 
                 <ScrollView style={{marginBottom: 40}}>
+                
+
                 <BoxForm>
-                    <TituloSection>
+                <TituloSection>
                         <LinhaTexto>
                             <Titulo style={{ marginRight: 10 }}>
                                 Inventario:
                             </Titulo>
                             <SubTitulo>
-                                Inventario Rotativo
+                                {nome}
                             </SubTitulo>
                         </LinhaTexto>
-                        <LinhaTexto>
-                            <Titulo style={{ marginRight: 10 }}>
-                                Código:
-                            </Titulo>
-                            <SubTitulo>
-                                0125030004
-                            </SubTitulo>
-                        </LinhaTexto>
-                        <Titulo>
-                            Busque um produto
-                        </Titulo>
-                    </TituloSection>
+                        </TituloSection>
                     <Row>
                         <Coloum>
                             <SubTitulo>
@@ -275,13 +389,12 @@ export default ({route}) => {
                                 placeholder="Digite o Código"
                                 keyboardType="numeric"
                                 placeholderTextColor="#000" 
-                                autoFocus={true}
                                 value={ean}
                                 onChangeText={inputEan => setEan(inputEan)}
                             />
                         </Coloum>
 
-                        <Coloum>
+                        {/* <Coloum>
                             <SubTitulo>
                                 Descrição
                             </SubTitulo>
@@ -290,16 +403,34 @@ export default ({route}) => {
                             value={descricao}
                                 onChangeText={inputDescricao => setDescricao(inputDescricao)}
                             />
-                        </Coloum>
+                        </Coloum> */}
                     </Row>
-                    <BotaoPrimario onPress={() => setShowCamera(true)}>
+                    {/* <BotaoPrimario onPress={() => setShowCamera(true)}>
                         <TextoBotao >Usar Leitor</TextoBotao>
-                    </BotaoPrimario>
+                    </BotaoPrimario> */}
 
-                    <BotaoSecundario onPress={buscar}>
-                        <TextoBotao >Pesquisar</TextoBotao>
+                    <BotaoSecundario onPress={() => buscar(ean)}>
+                        <TextoBotao >Filtrar</TextoBotao>
                     </BotaoSecundario>
+
+                    {/* <BotaoTodos onPress={buscarTudo}>
+                        <TextoBotao >Filtrar todos</TextoBotao>
+                    </BotaoTodos> */}
                 </BoxForm>
+
+                <BoxButtons>
+                    <BotaoFiltrar background={(filterItens == 'todos' ? true : false)} onPress={() => changeItens("todos")}>
+                        <TextoBotaoFiltrar background={(filterItens == 'todos' ? true : false)}>Todos</TextoBotaoFiltrar>
+                    </BotaoFiltrar>
+
+                    <BotaoFiltrar background={(filterItens == 'contados' ? true : false)} onPress={() => changeItens("contados")}>
+                        <TextoBotaoFiltrar background={(filterItens == 'contados' ? true : false)}>Contados</TextoBotaoFiltrar>
+                    </BotaoFiltrar>
+
+                    <BotaoFiltrar background={(filterItens == 'nao contados' ? true : false)} onPress={() => changeItens("nao contados")}>
+                        <TextoBotaoFiltrar background={(filterItens == 'nao contados' ? true : false)}>Não contados</TextoBotaoFiltrar>
+                    </BotaoFiltrar>
+                </BoxButtons>
 
                 {renderItens()}
 
@@ -311,12 +442,15 @@ export default ({route}) => {
                         sendAmount={sendAmount} load={loadAmount} sendClean={sendClean}/>
                 </Modal>
                 <Modal visible={showCamera} animationType="fade" transparent={true}>
-                    <Barcode value={value}/>
+                    <Barcode value={value} fecharCamera={() => setShowCamera(false)}/>
                 </Modal>
-                 <ModalCamera isVisible={showCamera} onCancel={() => setShowCamera(false)} value={value}/>
+                {/* <ModalCamera isVisible={showCamera} onCancel={() => setShowCamera(false)} value={value} type="ean"/> */}
 
                 </ScrollView>
-
+                    
+                <BotaoLeitor onPress={() => setShowCamera(true)}>
+                    <Icon name="plus" size={35} color="#ed702f"/>
+                </BotaoLeitor>
 
             </Container>
         </>

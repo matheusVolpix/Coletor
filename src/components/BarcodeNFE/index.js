@@ -38,50 +38,53 @@ export default props => {
   }
 
     const codeScanner = useCodeScanner({
-        codeTypes: ['ean-13'],
-        onCodeScanned: (codes, frame) => {
-        let value = JSON.stringify(
-            codes.map(({ value }) => value))
+    codeTypes: ['code-128', 'ean-13'], // code-128 é o mais comum para DANFE
+    onCodeScanned: (codes, frame) => {
+        const value = codes[0]?.value;
 
-            props.value(value)
+        if (!value) return;
+
+        // Checa se tem 44 dígitos e é numérico (chave da NFe)
+        if (/^\d{44}$/.test(value)) {
+        props.value(value); // Envia a chave da NF-e
+        } else {
+        // console.warn('Código lido, mas não é chave de NF-e:', value);
         }
+    }
+    });
 
-        
-
-      })
-
-      function view() {
-          if (permissionCamera && cameraAtiva) {
-            return (
-              <>
-                <Camera
-                  style={StyleSheet.absoluteFill}
-                  device={device}
-                  isActive={true}
-                  codeScanner={codeScanner}
-                  photoQualityBalance="balance"
-                />
-                <TouchableOpacity
-                  style={styles.buttonClose}
-                  onPress={props.fecharCamera} // <- fecha a câmera
-                >
-                  <Icon name="x" size={50} color="#fff" />
-                </TouchableOpacity>
-              </>
-            );
-          } else if (!permissionCamera) {
-            return (
-              <View style={styles.BoxModal}>
-                <TouchableOpacity
-                  onPress={permissionCameraAgain}
-                  style={styles.Button}
-                >
-                  <Text style={{ color: "#fff" }}>Acessar câmera</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          } 
-        }
+       function view() {
+    if (permissionCamera && cameraAtiva) {
+      return (
+        <>
+          <Camera
+            style={StyleSheet.absoluteFill}
+            device={device}
+            isActive={true}
+            codeScanner={codeScanner}
+            photoQualityBalance="balance"
+          />
+          <TouchableOpacity
+            style={styles.buttonClose}
+            onPress={props.fecharCamera} // <- fecha a câmera
+          >
+            <Icon name="x" size={50} color="#fff" />
+          </TouchableOpacity>
+        </>
+      );
+    } else if (!permissionCamera) {
+      return (
+        <View style={styles.BoxModal}>
+          <TouchableOpacity
+            onPress={permissionCameraAgain}
+            style={styles.Button}
+          >
+            <Text style={{ color: "#fff" }}>Acessar câmera</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } 
+  }
 
     return(
         <View style={styles.container}>           
@@ -136,13 +139,13 @@ const styles = StyleSheet.create({
         borderRadius: 33
     },
      close: {
-        width: '100%',
-        position: 'absolute',
-        top: 30,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
-     },
+    width: "100%",
+    position: "absolute",
+    top: 30,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center"
+    },
      buttonClose: {
         position: 'absolute',
         right: 15,

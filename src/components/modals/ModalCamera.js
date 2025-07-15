@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Modal, StyleSheet, Dimensions} from "react-native";
 import Barcode from "../Barcode";
+import BarcodeNFE from "../BarcodeNFE";
 
 const {width} = Dimensions.get('window');
 
@@ -15,7 +16,8 @@ export default props => {
             
             
             <View style={{flex: 1,backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', width: "100%"}}>
-                <Barcode value={props.value} />
+                {props.type == 'NFE' ? <BarcodeNFE value={props.value} /> : <Barcode value={props.value} />}
+                
             </View>
             
         </Modal>

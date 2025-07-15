@@ -21,6 +21,8 @@ export default ({children}) => {
     const [loadingAuth, setLoadingAuth] = useState(true);
     const [ip, setIp] = useState();
     const [ipJava, setIpJava] = useState();
+    // const ipLink = "http://192.168.15.157/api";
+    const ipLink = "http://volpix.com.br/api";
 
     useEffect(() => {
         async function loadStorage(){
@@ -35,31 +37,29 @@ export default ({children}) => {
 
     
             try{
-                await api.get('/me', {
+                const response = await fetch(ipLink+'/me', {
+                    method: 'GET',
                      headers: {
+                        'Accept': 'application/json',
                         "user": storageUser,
                          "password": storagePass,
                          "ip": storageIp
                      } 
-                 }).then((response) => {
+                 });
 
-                    if(response.data.ResumoGeral === "N" && 
-                        response.data.Produtos === "N" &&
-                        response.data.Etiqueta === "N" &&
-                        response.data.Solicitação === "N"){
-                        Alert.alert("Ops!", "Você esta sem acesso ao aplicativo");   
-                    }else{
+                 const json = await response.json();
 
-                        setResumoGeral(response.data.ResumoGeral);
-                        setProdutos(response.data.Produtos);
-                        setEtiqueta(response.data.Etiqueta);
-                        setSolicitacao(response.data.Solicitação);
-                        setUser(response.data.user);
-                        setStores(response.data.stores);
+                    
+
+                        setResumoGeral(json.ResumoGeral);
+                        setProdutos(json.Produtos);
+                        setEtiqueta(json.Etiqueta);
+                        setSolicitacao(json.Solicitação);
+                        setUser(json.user);
+                        setStores(json.stores);
                         setIp(storageIp);
-                        setIpJava(storageIpJava);
                         setLoadingAuth(false);
-                        let formated = response.data.date.replace("-", "/");
+                        let formated = json.date.replace("-", "/");
                         setDate(formated.replace("-", "/"));
 
                         
@@ -71,14 +71,8 @@ export default ({children}) => {
                             //setCurrentStore(current);
                         }else{
 
-                            setCurrentStore(response.data.stores[0]);
+                            setCurrentStore(json.stores[0]);
                         }
-
-                    }
-
-                    
-
-                 });
 
                  
          
@@ -118,63 +112,61 @@ export default ({children}) => {
     }
 
 
-    async function signIn(user, password, ip, ipJava){
+    async function signIn(user, password, ip){
 
         setLoading(true);
 
         try{
 
-            const response = await api.get("/me",{
+            const response = await fetch(ipLink+"/me",{
+                method: 'GET',
                 headers:{
-                    user: user,
-                    password: password,
-                    ip: ip
+                    'Accept': 'application/json',
+                    'user': user,
+                    'password': password,
+                    'ip': ip
                 }
-            }).then((response) => {
-                if(response.data.error){
-                    Alert.alert("ops!", response.data.error);
-                    return;
-                }
+            });
+            const json = await response.json();
 
+            // Debug para ver a estrutura da resposta
+            console.log("JSON:", json);
                 
-                if(response.data.ResumoGeral === "N" && 
-                    response.data.Produtos === "N" &&
-                    response.data.Etiqueta === "N" &&
-                    response.data.Solicitação === "N"
-                ){
-                    Alert.alert("Ops!", "Você esta sem acesso ao aplicativo");
+
+                if(json.error){
+                    Alert.alert("ops!", json.error);
+                    setLoading(false);
                     return;
                 }
 
-                setResumoGeral(response.data.ResumoGeral);
-                setProdutos(response.data.Produtos);
-                setEtiqueta(response.data.Etiqueta);
-                setSolicitacao(response.data.Solicitação);
-                setUser(response.data.user);
-                setStores(response.data.stores);
+                setResumoGeral(json.ResumoGeral);
+                setProdutos(json.Produtos);
+                setEtiqueta(json.Etiqueta);
+                setSolicitacao(json.Solicitação);
+                setUser(json.user);
+                setStores(json.stores);
                 setIp(ip);
-                setIpJava(ipJava);
-                let formated = response.data.date.replace("-", "/");
+                // setIpJava(ipJava);
+                let formated = json.date.replace("-", "/");
                 setDate(formated.replace("-", "/"));
                 
 
-                setCurrentStore(response.data.stores[0]);
+                setCurrentStore(json.stores[0]);
 
 
                 AsyncStorage.setItem("ipVendas", ip);
-                AsyncStorage.setItem("ipJava", ipJava);
+                // AsyncStorage.setItem("ipJava", ipJava);
 
                 AsyncStorage.setItem("user", user);
                 AsyncStorage.setItem("password", password);
 
-               
-
-
-            })
+                setLoading(false);
 
         }catch(err){
-            Alert.alert("Ops!", err);
             setLoading(false);
+            
+            setLoading(false);
+            console.log(err);
         }
 
         setLoading(false);
@@ -183,7 +175,7 @@ export default ({children}) => {
     }
 
     return (
-        <AuthContext.Provider value={{signed: !!user , 
+        <AuthContext.Provider value={{signed: !!user , ipLink,
             signIn, loadingAuth, loading, stores, ip, date, resumoGeral, produtos,
             etiqueta, solicitacao, ipJava, user, logoff, currentStore, currentStoreSelected, setConfig}}>
             {children}

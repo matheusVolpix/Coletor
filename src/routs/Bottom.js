@@ -8,10 +8,13 @@ import Tags from "../screens/collector/Tags";
 import Icon from "react-native-vector-icons/Feather";
 import { AuthContext } from "../contextApi/auth";
 import Inventario from "./Inventario/Stack";
+import Recebimento from "../pages/Recebimento";
+import { createStackNavigator } from "@react-navigation/stack";
+import Inicio from "../pages/Inicio";
 
 
 
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 
 export default props => {
@@ -63,16 +66,13 @@ export default props => {
     // }
 
     return (
-        <Tab.Navigator screenOptions={{headerShown: false}}>
-            <Tab.Screen name="Inventário" component={Inventario} 
-            options={{
-                title: "Inventário",
-                tabBarIcon: ({color, size}) =>
-                    <Icon name="archive" size={size} color={color} />
-            }}/>
+        <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="Inicio">
+            <Stack.Screen name="Inicio" component={Inicio} />
+            <Stack.Screen name="Inventário" component={Inventario} />
+            <Stack.Screen name="Recebimento" component={Recebimento} />
             
             
-        </Tab.Navigator>
+        </Stack.Navigator>
 
     )
     

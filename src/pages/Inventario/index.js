@@ -24,7 +24,7 @@ import Inventarios from "../../components/Inventario/Inventarios";
 
 export default props => {
 
-    const { user, stores, currentStore, currentStoreSelected, ip } = useContext(AuthContext);
+    const { user, stores, currentStore, currentStoreSelected, ip ,ipLink} = useContext(AuthContext);
     const [inputEan, setInputEan] = useState();
     const [inputDescricao, setInputDescricao] = useState();
     const [visiblePicker, setVisiblePicker] = useState(false);
@@ -38,7 +38,7 @@ export default props => {
         setLoad(true);
         try{
 
-            const response = await fetch('http://volpix.com.br/api/inventario/'+ currentStore.value, {
+            const response = await fetch(ipLink+'/inventario/'+ currentStore.value, {
                 method: 'GET',
                 headers: {
                     'Accept' : "/",
@@ -48,7 +48,15 @@ export default props => {
                 }
             }).then((response) => response.json())
             .then((json) => {
-                setInventarios(json.inventarios);
+                console.log(json);
+
+                if(json.inventarios != null){
+                    
+                    setInventarios(json.inventarios);
+                }else{
+                    Alert.alert("ops", "Nenhum inventario encontrado nessa loja");
+                }
+
                 setLoad(false);
             })
         }catch(error){
@@ -76,7 +84,7 @@ export default props => {
 
     return (
         <>
-            <Header title="Inventário" user={user.user} />
+            <Header title="Inventário" user={user.user} back={true}/>
             <Container>
 
                 <Titulo>Inventário</Titulo>

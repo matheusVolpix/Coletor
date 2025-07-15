@@ -3,6 +3,9 @@ import styled from "styled-components/native";
 export const Container = styled.View`
     width: 100%;
     padding: 15px;
+    flex: 1;
+    position: relative;
+    padding-bottom: 50px;
 `;
 
 export const BoxPesquisa = styled.View`

@@ -28,6 +28,8 @@ export default props => {
     const [ipVendas, setIp] = useState(ip);
     const [ipPortaJava, setIpJava] = useState(ipJava);
     const [showConfig, setShowConfig] = useState(false);
+    const [iconName, setIconName] = useState("eye-off");
+    const [viewPassword, setViewPassword] = useState(true);
 
     useEffect(() => {
 
@@ -41,6 +43,8 @@ export default props => {
 
             if(storageIp){
                 setIp(storageIp);
+            }else{
+                setShowConfig(true);
             }
 
             if(storageIpJava){
@@ -77,6 +81,17 @@ export default props => {
         signIn(user, password, ipVendas);
     }
 
+    function viewPass()
+    {
+        if(viewPassword){
+            setViewPassword(false);
+            setIconName('eye');
+        }else{
+            setViewPassword(true);
+            setIconName('eye-off');
+        }
+    }
+
     return(
         <SafeAreaView style={{flex: 1}}>
             <ModalConfig isVisible={showConfig}
@@ -102,15 +117,20 @@ export default props => {
                         <Icon name="user" size={20} color="#000" style={styles.icon}/>
                         <TextInput style={styles.textInput} placeholder="Insira seu usuário"
                         placeholderTextColor="#000"
+                        autoCapitalize="none"
                         value={user} onChangeText={user => setUser(user)}/>
                     </View>
 
                     <View style={styles.boxInput}>
                         <Icon name="lock" size={20} color="#000" style={styles.icon}/>
                         <TextInput style={styles.textInput} placeholder="Insira seu senha"
-                        secureTextEntry={true} value={password}
+                        secureTextEntry={viewPassword} value={password}
                         placeholderTextColor="#000" 
+                        autoCapitalize="none"
                         onChangeText={password => setPassword(password)}/>
+                        <TouchableOpacity style={styles.buttonIcon} onPress={viewPass}>
+                            <Icon name={iconName} size={20} color="#000"/>
+                        </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity style={styles.button} onPress={handlerSignIn}>
@@ -174,6 +194,9 @@ const styles = StyleSheet.create({
     icon:{
         width: "10%",
         textAlign: 'center'
+    },
+    buttonIcon: {
+        width: "10%"
     },
     button:{
         flexDirection: "row",
