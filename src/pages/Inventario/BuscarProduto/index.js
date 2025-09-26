@@ -15,6 +15,7 @@ import { BoxForm,
     Ean,
     Quantidade,
     Botao,
+    BotaoCamera,
     BoxButtons,
     BotaoFiltrar,
     TextoBotaoFiltrar,
@@ -30,11 +31,12 @@ import ModalInventario from "../../../components/Inventario/ModalInventario";
 import ModalCamera from "../../../components/modals/ModalCamera";
 import Barcode from "../../../components/Barcode";
 import Icon from "react-native-vector-icons/Feather";
+import Footer from "../../../components/Footer";
 
 
 export default ({route}) => {
 
-    const {codigo, nome} = route.params;
+    const {codigo, nome, status} = route.params;
     
     // const codigo = '0125040001';
     // const nome = "Inventario Rotativo";
@@ -49,6 +51,9 @@ export default ({route}) => {
     const [loadAmount, setLoadAmount] = useState(false);
     const [showCamera, setShowCamera] = useState(false);
     const [filterItens, setFilterItens] = useState("todos");
+    const [todos, setTodos] = useState(0);
+    const [contados, setContados] = useState(0);
+    const [naoContados, setNaoContados] = useState(0);
 
     useEffect(() => {
 
@@ -76,7 +81,11 @@ export default ({route}) => {
             }).then((response) => response.json())
             .then((json) => {
                 
+                
                 setItems(json.inventarios);
+                setTodos(json.todos);
+                setContados(json.contados);
+                setNaoContados(json.naoContados);
 
                 setLoadItens(false);
             })
@@ -109,6 +118,9 @@ export default ({route}) => {
             .then((json) => {
                 
                 setItems(json.inventarios);
+                setTodos(json.todos);
+                setContados(json.contados);
+                setNaoContados(json.naoContados);
 
                 setLoadItens(false);
             })
@@ -160,6 +172,10 @@ export default ({route}) => {
                     }
                     
                 }
+
+                setTodos(json.todos);
+                setContados(json.contados);
+                setNaoContados(json.naoContados);
                 
                 
                 setLoadItens(false);
@@ -192,6 +208,9 @@ export default ({route}) => {
             .then((json) => {
 
                 setItems(json.inventarios);
+                setTodos(json.todos);
+                setContados(json.contados);
+                setNaoContados(json.naoContados);
                 
                 setLoadItens(false);
             })
@@ -207,6 +226,10 @@ export default ({route}) => {
 
     function openModal(itens)
     {
+        if(status == 'P'){
+            Alert.alert('erro', 'Esse inventario ja foi processado, voce não pode mais realizar alterações');
+            return;
+        }
         setItemSelected(itens);
         setModal(true)
     }
@@ -304,6 +327,9 @@ export default ({route}) => {
             .then((json) => {
                 
                 setItems(json.inventarios);
+                setTodos(json.todos);
+                setContados(json.contados);
+                setNaoContados(json.naoContados);
                 setModal(false);
                 setLoadAmount(false);
 
@@ -371,15 +397,15 @@ export default ({route}) => {
 
                 <BoxForm>
                 <TituloSection>
-                        <LinhaTexto>
-                            <Titulo style={{ marginRight: 10 }}>
-                                Inventario:
-                            </Titulo>
-                            <SubTitulo>
-                                {nome}
-                            </SubTitulo>
-                        </LinhaTexto>
-                        </TituloSection>
+                    <LinhaTexto>
+                        <Titulo style={{ marginRight: 10 }}>
+                            Inventario: {codigo}
+                        </Titulo>
+                        <SubTitulo>
+                            {nome}
+                        </SubTitulo>
+                    </LinhaTexto>
+                </TituloSection>
                     <Row>
                         <Coloum>
                             <SubTitulo>
@@ -393,6 +419,10 @@ export default ({route}) => {
                                 onChangeText={inputEan => setEan(inputEan)}
                             />
                         </Coloum>
+
+                        <BotaoCamera onPress={() => setShowCamera(true)}>
+                            <Icon name="camera" size={26} color="#000"/>
+                        </BotaoCamera>
 
                         {/* <Coloum>
                             <SubTitulo>
@@ -420,15 +450,15 @@ export default ({route}) => {
 
                 <BoxButtons>
                     <BotaoFiltrar background={(filterItens == 'todos' ? true : false)} onPress={() => changeItens("todos")}>
-                        <TextoBotaoFiltrar background={(filterItens == 'todos' ? true : false)}>Todos</TextoBotaoFiltrar>
+                        <TextoBotaoFiltrar background={(filterItens == 'todos' ? true : false)}>Todos ({todos})</TextoBotaoFiltrar>
                     </BotaoFiltrar>
 
                     <BotaoFiltrar background={(filterItens == 'contados' ? true : false)} onPress={() => changeItens("contados")}>
-                        <TextoBotaoFiltrar background={(filterItens == 'contados' ? true : false)}>Contados</TextoBotaoFiltrar>
+                        <TextoBotaoFiltrar background={(filterItens == 'contados' ? true : false)}>Contados ({contados})</TextoBotaoFiltrar>
                     </BotaoFiltrar>
 
                     <BotaoFiltrar background={(filterItens == 'nao contados' ? true : false)} onPress={() => changeItens("nao contados")}>
-                        <TextoBotaoFiltrar background={(filterItens == 'nao contados' ? true : false)}>Não contados</TextoBotaoFiltrar>
+                        <TextoBotaoFiltrar background={(filterItens == 'nao contados' ? true : false)}>Não contados ({naoContados})</TextoBotaoFiltrar>
                     </BotaoFiltrar>
                 </BoxButtons>
 
@@ -448,11 +478,12 @@ export default ({route}) => {
 
                 </ScrollView>
                     
-                <BotaoLeitor onPress={() => setShowCamera(true)}>
+                {/* <BotaoLeitor onPress={() => setShowCamera(true)}>
                     <Icon name="plus" size={35} color="#ed702f"/>
-                </BotaoLeitor>
+                </BotaoLeitor> */}
 
             </Container>
+            <Footer />
         </>
     )
 }

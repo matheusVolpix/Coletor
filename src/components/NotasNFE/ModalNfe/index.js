@@ -1,21 +1,11 @@
 import React from "react";
-import { Alert, View } from "react-native";
-import { Item,
-    NomeItem,
-    Ean,
-    ContainerQuantidade,
-    Quantidade
- } from "../Inventario/ListaInventario/style";
- import { Baixado,
-    BotaoStatus,
-    TextoBotaoStatus,
-    Cabecalho,
-    BotaoBoleto,
-    Titulo
-  } from "./style";
+import { Background, BoxModal, TopModal, BotaoFechar, Title } from "./style";
+import { Alert, TouchableWithoutFeedback, View } from "react-native";
+import { Ean, NomeItem } from "../../Inventario/ListaInventario/style";
+import { BotaoBoleto, BotaoStatus, TextoBotaoStatus } from "../style";
 import Icon from "react-native-vector-icons/Feather";
 
-export default ({itens, remove, enviar, abrirCamera, abrirCameraBoleto, chaveAtual}) => {
+export default ({fecharModal, itens, serie, enviar, chaveAtual}) => {
 
     function formatarBRL()
     {
@@ -28,30 +18,22 @@ export default ({itens, remove, enviar, abrirCamera, abrirCameraBoleto, chaveAtu
         
         return;
     }
-    
 
     function buttonStats()
     {
         if(itens.status == 'pendente'){
             return(
-                <>
-                    <BotaoStatus background="red" onPress={mudarNota}>
-                        <TextoBotaoStatus>Iniciar Conferência</TextoBotaoStatus>
-                    </BotaoStatus>
-
-                    
-                </>
+                <BotaoStatus background="red" onPress={mudarNota}>
+                    <TextoBotaoStatus>Iniciar Conferência</TextoBotaoStatus>
+                </BotaoStatus>
             )
         }
 
         if(itens.status == 'em-andamento'){
             return(
-                <>
-
                 <BotaoStatus background="#f5f116" onPress={mudarNota}>
                     <TextoBotaoStatus background="#000">Finalizar Conferência</TextoBotaoStatus>
                 </BotaoStatus>
-                </>
             )
         }
 
@@ -67,7 +49,19 @@ export default ({itens, remove, enviar, abrirCamera, abrirCameraBoleto, chaveAtu
     function mudarNota()
     {
         if(itens.status == 'pendente'){
-            abrirCamera();
+            Alert.alert("Atenção", "Essa nota esta como PENDENTE, você tem certeza que desja alterar o status dela para EM ANDAMENTO?",
+                [
+                    {
+                        text: 'Cancelar',
+                        onPress: () => console.log('Cancelado'),
+                        style: 'cancel', // estilo iOS para botão de cancelar
+                    },
+                    {
+                        text: 'OK',
+                        onPress: () => enviar(itens.chave),
+                    },
+                ],
+            );
         }
 
         if(itens.status == 'em-andamento'){
@@ -97,21 +91,6 @@ export default ({itens, remove, enviar, abrirCamera, abrirCameraBoleto, chaveAtu
         }
     }
 
-    function dataStatus()
-    {
-        if(itens.status == 'pendente'){
-            return itens.datainclusao;
-        }
-
-        if(itens.status == 'em-andamento'){
-            return itens.dataandamento;
-        }
-
-        if(itens.status == 'recebida'){
-            return itens.datarecebida;
-        }
-    }
-
     function botaoBoleto()
     {
         if(itens.status == "em-andamento"){
@@ -123,25 +102,38 @@ export default ({itens, remove, enviar, abrirCamera, abrirCameraBoleto, chaveAtu
         }
     }
 
+
     return(
-        <Item onLongPress={() => remove(itens.chave, itens.loja)}>
-            <Cabecalho>
-                <Titulo>
-                    NNF: {itens.serie} {itens.nnfe}
-                </Titulo>
+        <Background>
+            <TouchableWithoutFeedback onPress={fecharModal}>
+                <View style={{flex: 1}}></View>
+            </TouchableWithoutFeedback>
 
-                {botaoBoleto()}
+            <BoxModal>
+                <TopModal>
+                    <Title> NNF: {serie}</Title>
 
-            </Cabecalho>
-            <Ean>{itens.fornecedor}</Ean>
-            <Ean>cnpj: {itens.cnpj}</Ean>
-            <Ean>emissao: {itens.emissao}</Ean>
-            <Ean>Total: {formatarBRL()}</Ean>
-            {/* <Ean>status: {itens.status}</Ean> */}
-            <Ean>(Loja: {itens.loja} - {itens.nomeusuario} - {dataStatus()})</Ean>
-            {/* {itens.baixado == 'S' ? 
-            <Baixado>Processada</Baixado> : null} */}
-            {buttonStats()}
-        </Item>
+                    {botaoBoleto()}
+
+                    <BotaoFechar onPress={fecharModal}>
+                        <Icon name="x" size={25} color="#000"/>
+                    </BotaoFechar>
+                </TopModal>
+                
+                <Ean>{itens.fornecedor}</Ean>
+                <Ean>cnpj: {itens.cnpj}</Ean>
+                <Ean>emissao: {itens.emissao}</Ean>
+                <Ean>Total: {formatarBRL()}</Ean>
+                <Ean>(Loja: {itens.loja} - {itens.nomeusuario} - {itens.datainclusao})</Ean>
+                {buttonStats()}
+            </BoxModal>
+
+            {console.log(itens)}
+
+            <TouchableWithoutFeedback onPress={fecharModal}>
+                <View style={{flex: 1}}></View>
+            </TouchableWithoutFeedback>
+
+        </Background>
     )
 }

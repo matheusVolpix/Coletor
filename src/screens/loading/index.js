@@ -1,6 +1,6 @@
 import React from "react";
 import { View, ActivityIndicator, Image, StyleSheet } from "react-native";
-import logo from "../../../assets/img/Logo-loading.png";
+import logo from "../../../assets/img/logo.png";
 import stylesDefault from "../../pages/stylesDefault";
 
 export default props => {
@@ -19,10 +19,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#fff"
+        backgroundColor: stylesDefault.colors.backgroundColorBlack
     },
     logo: {
         width: "90%",
-        marginBottom: 20
+        height: "20%",
+        resizeMode: 'contain'
     }
 })

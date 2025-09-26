@@ -4,7 +4,6 @@ export const Container = styled.View`
     width: 100%;
     padding: 15px;
     flex: 1;
-    padding-bottom: 100px;
 `;
 
 export const BotaoLeitor = styled.TouchableOpacity`
@@ -22,4 +21,20 @@ export const BotaoLeitor = styled.TouchableOpacity`
     border-width: 1px;
     border-style: solid;
     border-color: #ed702f;
+`;
+
+export const Flex = styled.View`
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+`;
+
+export const BotaoCamera = styled.TouchableOpacity`
+    padding: 5px;
+    border: 1px solid;
+    border-color: #000;
+    margin-bottom: 20px;
+    margin-left: 20px;
 `;

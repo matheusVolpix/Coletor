@@ -4,8 +4,7 @@ export const Container = styled.View`
     width: 100%;
     padding: 15px;
     flex: 1;
-    position: relative;
-    padding-bottom: 50px;
+    margin-bottom: -30px;
 `;
 
 export const BoxPesquisa = styled.View`

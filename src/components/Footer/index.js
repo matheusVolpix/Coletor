@@ -5,8 +5,8 @@ import stylesDefault from "../../pages/stylesDefault";
 export default ({current}) => {
     return(
         <View style={styles.container}>
-            <Text style={styles.text}>Volpix 1.0.1</Text>
-            <Text style={styles.text}>{current}</Text>
+            <Text style={styles.text}>Versão Volpix 1.1.22</Text>
+            {/* <Text style={styles.text}>{current}</Text> */}
         </View>
     )
 }

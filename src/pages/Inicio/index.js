@@ -7,6 +7,7 @@ import { Background,
     TextButtonOption
  } from "./style";
 import { useNavigation } from "@react-navigation/native";
+import Footer from "../../components/Footer";
 
 export default props => {
 
@@ -27,6 +28,7 @@ export default props => {
                 </ButtonOption>
 
             </Background>
+            <Footer />
         </>
     )
 }

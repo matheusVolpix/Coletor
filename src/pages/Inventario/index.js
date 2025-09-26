@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
     View, Text, TouchableOpacity, Alert,
     ScrollView,
@@ -21,6 +21,7 @@ import {
 } from "./style";
 import Picker from "../../components/Picker";
 import Inventarios from "../../components/Inventario/Inventarios";
+import Footer from "../../components/Footer";
 
 export default props => {
 
@@ -32,6 +33,10 @@ export default props => {
     const [lojaSelecionada, setLojaSelecionada] = useState();
     const [load, setLoad] = useState(false);
     const [inventarios, setInventarios] = useState([]);
+
+    useEffect(() => {
+        pesquisarInventario();
+    }, [currentStore]);
 
     async function pesquisarInventario() {
         
@@ -54,6 +59,7 @@ export default props => {
                     
                     setInventarios(json.inventarios);
                 }else{
+                    setInventarios([]);
                     Alert.alert("ops", "Nenhum inventario encontrado nessa loja");
                 }
 
@@ -64,10 +70,6 @@ export default props => {
             setLoad(false);
         }
     }
-    const dados = [
-        { id: "1", nome: "Item 1", codigoEan: '07898947980768' },
-        { id: "2", nome: "Item 2", codigoEan: '07622210575975' },
-    ];
 
     function render()
     {
@@ -124,6 +126,7 @@ export default props => {
                 {render()}
 
             </Container>
+            <Footer />
         </>
     )
 }

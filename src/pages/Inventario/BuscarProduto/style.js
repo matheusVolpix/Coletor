@@ -14,6 +14,7 @@ export const Row = styled.View`
     justify-content: space-between;
     margin: 20px 0px;
     gap: 20px;
+    align-items: flex-end;
 `
 
 export const Coloum = styled.View`
@@ -52,6 +53,13 @@ export const TextInput = styled.TextInput`
     width: 100%;
     color: #000;
 `
+
+export const BotaoCamera = styled.TouchableOpacity`
+    padding: 5px;
+    border: 1px solid;
+    border-color: #000;
+`;
+
 
 export const BotaoPrimario = styled.TouchableOpacity`
 background-color: #20a8d8;
