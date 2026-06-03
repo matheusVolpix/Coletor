@@ -14,7 +14,7 @@ export default props => {
                     <Text style={styles.titleBox}>{item.descricaocompleta}</Text>
                 </View>
                 <Text style={styles.text}>{item.codigoean}</Text>
-                <Text style={styles.text}>Loja {store}</Text>
+                <Text style={styles.text}>Loja {store.label}</Text>
                 <Text style={styles.text}>Qtd Est: {item.estoque}</Text>
                 <Text style={styles.text}>R$ Custo: {item.custo}</Text>
                 <Text style={styles.text}>R$ Venda: {item.precovenda1}</Text>

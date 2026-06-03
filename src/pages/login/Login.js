@@ -73,12 +73,12 @@ export default props => {
 
     function handlerSignIn(){
 
-        if(!ipVendas){
+        if(!ipVendas || !ipPortaJava){
             Alert.alert("Ops!", "Por favor insira as configurações de IP e porta");
             return;
         }
 
-        signIn(user, password, ipVendas);
+        signIn(user, password, ipVendas, ipPortaJava);
     }
 
     function viewPass()

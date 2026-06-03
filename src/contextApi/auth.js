@@ -58,6 +58,7 @@ export default ({children}) => {
                         setUser(json.user);
                         setStores(json.stores);
                         setIp(storageIp);
+                        setIpJava(storageIpJava);
                         setLoadingAuth(false);
                         let formated = json.date.replace("-", "/");
                         setDate(formated.replace("-", "/"));
@@ -112,7 +113,7 @@ export default ({children}) => {
     }
 
 
-    async function signIn(user, password, ip){
+    async function signIn(user, password, ip, ipJava){
 
         setLoading(true);
 
@@ -146,7 +147,7 @@ export default ({children}) => {
                 setUser(json.user);
                 setStores(json.stores);
                 setIp(ip);
-                // setIpJava(ipJava);
+                setIpJava(ipJava);
                 let formated = json.date.replace("-", "/");
                 setDate(formated.replace("-", "/"));
                 
@@ -155,7 +156,7 @@ export default ({children}) => {
 
 
                 AsyncStorage.setItem("ipVendas", ip);
-                // AsyncStorage.setItem("ipJava", ipJava);
+                AsyncStorage.setItem("ipJava", ipJava);
 
                 AsyncStorage.setItem("user", user);
                 AsyncStorage.setItem("password", password);

@@ -1,7 +1,5 @@
 import React, {useState, useContext, useEffect} from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { Picker } from "@react-native-picker/picker";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, KeyboardAvoidingView, Modal } from "react-native";
 import api from "../../services/api";
 import ModalCollector from "../../components/modals/ModalCollector";
 import { AuthContext } from "../../contextApi/auth";
@@ -13,6 +11,8 @@ import ModalCamera from "../../components/modals/ModalCamera";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BotaoPicker, TextoBotaoPicker } from "./style";
+import Picker from "../../components/Picker";
 
 
 
@@ -20,6 +20,8 @@ export default props => {
 
     const {stores, ip, ipJava, user, currentStore, currentStoreSelected} = useContext(AuthContext);
     const [storeSelected, setStoreSelected] = useState();
+    const [nomeLojaSelecionada, setNomeLojaSelecionada] = useState('Selecione a filial');
+    const [visiblePicker, setVisiblePicker] = useState(false);
     const [ean, setEan] = useState("");
     const [description, setDescription] = useState("");
     const [showCamera, setShowCamera] = useState(false);
@@ -102,31 +104,33 @@ export default props => {
             setLoading(false);
             return;
         }
-        
-                try{
-                    const response = await api.get(`http://${ip}:${ipJava}/VolpixWebService/webresources/generic/Produto/${eanInput}/${descriptionInput}/${storeSelected}`, {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        } 
-                    }).then((resp) => {
-                        const products = resp.data;
-                        if(!products){
-                            Alert.alert("ops!", `Não foi possivel localizar o produto`);
-                            setLoading(false);
-                            return;
-                        }
-                        setProducts(products);
-                        getSolicitation();
-                        
-                    })
 
-                    
-         
-                } catch (e) {
-                    Alert.alert("Ops!", `${test}`);
+        
+        try{
+            const response = await api.get(`http://${ip}:${ipJava}/VolpixWebService/webresources/generic/Produto/${eanInput}/${descriptionInput}/${storeSelected}`, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                } 
+            }).then((resp) => {
+                const products = resp.data;
+                if(!products){
+                    Alert.alert("ops!", `Não foi possivel localizar o produto`);
                     setLoading(false);
+                    return;
                 }
-            }
+                setProducts(products);
+                getSolicitation();
+                
+            })
+
+            
+    
+        } catch (e) {
+            Alert.alert("Ops!", 'ocorreu um erro');
+            console.log(e);
+            setLoading(false);
+        }
+    }
 
     getSolicitation = async () => {
         try{
@@ -315,11 +319,11 @@ export default props => {
         }
     }
 
-    let buildPicker = stores.map((v,k) => {
-        return(
-            <Picker.Item key={k} value={v.value} label={v.label}/>
-        )
-    })
+    // let buildPicker = stores.map((v,k) => {
+    //     return(
+    //         <Picker.Item key={k} value={v.value} label={v.label}/>
+    //     )
+    // })
 
     function getStoreSelected()
     {
@@ -342,15 +346,25 @@ export default props => {
                 
                 <ModalCamera isVisible={showCamera} onCancel={() => setShowCamera(false)} value={value}/>
                 <ModalCollector isVisible={showModal} items={products} 
-                onCancel={() => setShowModal(false)}
-                loading={loadingModal}
-                loadingTag={loadingTag}
-                solicitacao={registerSolicitation} solicitacoes={solicitations}
-                solicitacaoRemove={solicitacaoRemove}
-                tag={registerTag}
-                tags={tags}
-                store={currentStore}
-                tagRemove={deleteTag}/>
+                    onCancel={() => setShowModal(false)}
+                    loading={loadingModal}
+                    loadingTag={loadingTag}
+                    solicitacao={registerSolicitation} solicitacoes={solicitations}
+                    solicitacaoRemove={solicitacaoRemove}
+                    tag={registerTag}
+                    tags={tags}
+                    store={currentStore}
+                    tagRemove={deleteTag}/>
+
+                <Modal visible={visiblePicker} animationType="slide" transparent={true}>
+                    <Picker isVisible={() => setVisiblePicker(false)}
+                        list={stores}
+                        itemSelected={item => [
+                            currentStoreSelected(item.value),
+                            setStoreSelected(item.value),
+                            setNomeLojaSelecionada(item.label)
+                        ]}/>
+                </Modal>
                 
                 <View style={styles.boxDefault}>
                     <Text style={styles.title}>Filtre por codigo de barras, descriçao e filial</Text>
@@ -369,25 +383,23 @@ export default props => {
                     </View>
                     <View style={styles.boxInput}>
                         <Text style={{color: "#000"}}>Filial</Text>
-                        <View style={styles.dropdown}>
-                            <Picker
-                                    style={{color: "#000"}}
-                                    selectedValue={getStoreSelected()}
-                                    onValueChange={(value, _) =>[
-                                        setStoreSelected(value),
-                                        currentStoreSelected(value),
-                                        AsyncStorage.setItem("filial", value)
-                                    ]}>
-                                <Picker.Item key={99} value={0} label=""/>
-                                {buildPicker}
-                            </Picker>
-                        </View>
+                        {currentStore ? 
+                                            
+                            (<BotaoPicker onPress={() => setVisiblePicker(true)}>
+                                <TextoBotaoPicker>{
+                                nomeLojaSelecionada === '' ? 
+                                currentStore.label : nomeLojaSelecionada
+                                }</TextoBotaoPicker>
+                            </BotaoPicker>) : null
+                                
+                            }
+                        
                     </View>
                     <TouchableOpacity
                     onPress={search}
                     style={[styles.button, {backgroundColor: stylesDefault.colors.colorPrimary}]}>
                          {loading ? <ActivityIndicator size={25} color="#fff"/> : <Text style={{color: '#fff'}}>Filtrar</Text>}
-                    </TouchableOpacity>
+                    </TouchableOpacity> 
                     <TouchableOpacity style={[styles.button, {backgroundColor: '#20a8d8'}]}
                     onPress={scannShow}>
                         <Text style={{color: '#fff'}}>Leitor</Text>

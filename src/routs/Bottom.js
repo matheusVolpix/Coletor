@@ -70,6 +70,7 @@ export default props => {
             <Stack.Screen name="Inicio" component={Inicio} />
             <Stack.Screen name="Inventário" component={Inventario} />
             <Stack.Screen name="Recebimento" component={Recebimento} />
+            <Stack.Screen name="Coletor" component={Collector} />
             
             
         </Stack.Navigator>

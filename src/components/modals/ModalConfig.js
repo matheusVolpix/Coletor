@@ -50,13 +50,13 @@ export default props => {
                         onChangeText={(ip)=> setIpVendas(ip)} />
                     </View>
 
-                    {/* <View style={{alignItems: "center"}}>
+                    <View style={{alignItems: "center"}}>
                         <TextInput style={styles.input} placeholder="Porta do Ip2 (Ex: 8585 ou 8080)"
                          autoCapitalize='none'
                         placeholderTextColor="#b8b6b6" 
                         value={portaJava}
                         onChangeText={value => setPortaJava(value)}/>
-                    </View> */}
+                    </View>
                     <View style={{alignItems: "center"}}>
                         <TouchableOpacity style={styles.button}
                         onPress={() => props.insertIp(ipVendas, portaJava)}>

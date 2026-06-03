@@ -23,6 +23,10 @@ export default props => {
                     <TextButtonOption>Inventario</TextButtonOption>
                 </ButtonOption>
 
+                <ButtonOption onPress={() => navigation.navigate('Coletor')}>
+                    <TextButtonOption>Coletor</TextButtonOption>
+                </ButtonOption>
+
                 <ButtonOption onPress={() => navigation.navigate('Recebimento')}>
                     <TextButtonOption>Recebimento</TextButtonOption>
                 </ButtonOption>

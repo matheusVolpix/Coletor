@@ -102,7 +102,7 @@ export default props => {
                         }</TextoBotaoPicker>
                     </BotaoPicker>) : null
                         
-                }
+                    }
 
                     <BotaoSecundario onPress={pesquisarInventario}>
                         {load ? (
