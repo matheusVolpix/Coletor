@@ -25,7 +25,7 @@ import Footer from "../../components/Footer";
 
 export default props => {
 
-    const { user, stores, currentStore, currentStoreSelected, ip ,ipLink} = useContext(AuthContext);
+    const { user, stores, currentStore, currentStoreSelected, ip ,ipLink, ipJava} = useContext(AuthContext);
     const [inputEan, setInputEan] = useState();
     const [inputDescricao, setInputDescricao] = useState();
     const [visiblePicker, setVisiblePicker] = useState(false);
@@ -35,8 +35,32 @@ export default props => {
     const [inventarios, setInventarios] = useState([]);
 
     useEffect(() => {
-        pesquisarInventario();
+        pegarInventarios();
     }, [currentStore]);
+
+    async function pegarInventarios()
+    {
+        setLoad(true);
+        const url = `http://${ip}:${ipJava}/VolpixWebService/webresources/generic/GetInventarios?loja=${currentStore.value}`;
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+            });
+
+            const text = await response.text();
+
+            console.log(text); // Ex.: "True"
+
+            if (text === "True") {
+                pesquisarInventario();
+            }
+
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoad(false);
+        }
+    }
 
     async function pesquisarInventario() {
         

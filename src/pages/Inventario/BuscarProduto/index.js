@@ -170,6 +170,8 @@ export default ({route}) => {
                         }
                         openModal(iten);
                     }
+
+                    console.log(json);
                     
                 }
 

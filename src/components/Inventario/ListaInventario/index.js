@@ -20,7 +20,7 @@ export default ({itens, openModal}) => {
     return(
         <Item onPress={send}>
             <NomeItem>
-                {itens.descricao}
+                {itens.descricao ?? itens.DESCRICAO}
                 </NomeItem>
             <Ean>EAN: {itens.CODIGOEAN}</Ean>
             <ContainerQuantidade>

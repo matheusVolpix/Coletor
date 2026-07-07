@@ -39,8 +39,10 @@ export default ({isVisible, item, sendAmount, load, sendClean}) => {
                 <View style={{flex: 1}}></View>
             </TouchableWithoutFeedback>
 
+            {console.log(item)}
+
             <Box>
-                <NomeItem>{item.descricao}</NomeItem>
+                <NomeItem>{item.descricao ?? item.DESCRICAO}</NomeItem>
                 <Ean>EAN: {item.CODIGOEAN}</Ean>
                 <NomeInventario>Total: {item.QUANTIDADE}</NomeInventario>
                 <BoxInput>
